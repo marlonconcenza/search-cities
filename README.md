@@ -7,6 +7,8 @@
 
 ## Sobre este projeto
 
+Projeto para aplicar conceitos de busca de cidades em modal com filtro da lista de cidades.
+Os dados dos estados e cidade são carregador a partir da API pública do [IBGE](https://servicodados.ibge.gov.br/api/docs) 
 
 ![Preview](https://github.com/marlonconcenza/search-cities/blob/master/.github/preview.gif "Preview")
 
