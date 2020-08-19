@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import { RectButton } from 'react-native-gesture-handler';
 import RNPickerSelect from 'react-native-picker-select';
 import Modal from 'react-native-modal';
 import axios from 'axios';
+
+import removeAccents from './util';
 
 interface City {
   id: number,
@@ -35,6 +38,8 @@ export default function App() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [ originalCities, setOriginalCities ] = useState<City[]>(cities);
 
+  const [ loading, setLoading ] = useState<Boolean>(false);
+
   useEffect(() => {
     axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderby=nome').then(response => {
         if (response) {
@@ -50,6 +55,7 @@ export default function App() {
   useEffect(() => {
 
     setCities([]);
+    setLoading(true);
 
     if (selectedUF === '') {
         return;
@@ -63,10 +69,15 @@ export default function App() {
               name: city.nome
             }));
 
-            setCities(cities);
-            setOriginalCities(cities);
+            //Timeout para simular demora no carregamento das cidades e exibir o loading
+            setTimeout(() => {
+              setCities(cities);
+              setOriginalCities(cities);
+              setLoading(false);  
+            }, 4000);
         }
     });
+    
   }, [selectedUF]);
 
   const handleModal = () => {
@@ -76,7 +87,8 @@ export default function App() {
   const handleFilterCity = (filter: string) => {
 
     const filteredCities = originalCities.filter(city => {
-      return city.name.includes(filter);
+      return removeAccents(city.name.toLowerCase()).includes(removeAccents(filter.toLowerCase()));
+      //return city.name.toLowerCase().includes(filter.toLowerCase());
     });
 
     setCities(filteredCities);
@@ -125,14 +137,24 @@ export default function App() {
               placeholder="Digite para filtrar" 
               placeholderTextColor="black"
           />
-          <View style={styles.list}>
-            <FlatList
-              data={cities}
-              keyExtractor={city => String(city.id)}
-              renderItem={renderItem}
-            />
-            <Button title="OK" onPress={handleModal} />
-          </View>
+
+          {loading ? 
+            <View style={styles.loading}>
+              <ActivityIndicator />
+            </View>
+          :
+            <View style={styles.list}>
+              <FlatList
+                data={cities}
+                keyExtractor={city => String(city.id)}
+                renderItem={renderItem}
+              />
+            </View>
+          }
+
+          <RectButton onPress={handleModal} style={styles.okButton}>
+            <Text style={styles.okButtonText}>Fechar</Text>
+          </RectButton>
         </View>
         
       </Modal>
@@ -147,23 +169,21 @@ const styles = StyleSheet.create({
       backgroundColor: "#f0f0f7",
       alignItems: 'center',
       justifyContent: 'center',
+      padding: 20
   },
   containerModal: {
     flex: 1,
     backgroundColor: "#f0f0f7",
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-    paddingTop: 20
+    padding: 20
   },
   list: {
     flex: 1,
     backgroundColor: "#f0f0f7",
-    width: '90%'
+    width: '100%'
   },
   label: {
       color: 'purple',
-      width: '90%',
+      width: '100%',
       fontWeight: "bold"
   },
   input: {
@@ -173,7 +193,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 16,
       marginTop: 4,
       marginBottom: 16,
-      width: '90%',
+      width: '100%',
       fontWeight: "bold",
   },
   inputSelect: {
@@ -183,8 +203,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 4,
     marginBottom: 16,
-    marginLeft: 15,
-    width: '91%',
+    width: '100%',
     fontWeight: "bold",
   },
   item: {
@@ -197,4 +216,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 30,
   },
+  loading: {
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  okButton: {
+    backgroundColor: '#04d361',
+    height: 58,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8
+  },
+  okButtonText: {
+      color: '#FFF',
+      fontSize: 16,
+  }
 });
