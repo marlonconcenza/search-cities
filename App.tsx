@@ -87,8 +87,12 @@ export default function App() {
   const handleFilterCity = (filter: string) => {
 
     const filteredCities = originalCities.filter(city => {
-      return removeAccents(city.name.toLowerCase()).includes(removeAccents(filter.toLowerCase()));
-      //return city.name.toLowerCase().includes(filter.toLowerCase());
+
+      //Remove Accents
+      const cityName = city.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      filter = filter.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      return cityName.includes(filter);
     });
 
     setCities(filteredCities);
@@ -155,10 +159,9 @@ export default function App() {
           <RectButton onPress={handleModal} style={styles.okButton}>
             <Text style={styles.okButtonText}>Fechar</Text>
           </RectButton>
-        </View>
-        
+
+        </View>        
       </Modal>
-    
     </View>
   );
 }
