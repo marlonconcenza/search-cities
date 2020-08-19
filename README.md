@@ -27,3 +27,11 @@ Para executar esse projeto no modo de desenvolvimento, você precisará basicame
 ```bash
 $ git clone https://github.com/marlonconcenza/search-cities.git
 ```
+
+## Scripts disponíveis
+
+No diretório do seu projeto, você pode rodar:
+
+### `yarn start`
+
+Executa o projeto em modo de desenvolvimento.
