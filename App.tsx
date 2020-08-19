@@ -31,9 +31,9 @@ export default function App() {
 
   const [ cities, setCities ] = useState<City[]>([]);
   const [ selectedCity, setSelectedCity ] = useState("");
-  const [ idCity, setIdCity ] = useState(0);
+
   const [isModalVisible, setModalVisible] = useState(false);
-  const [ originCities, setOriginCities ] = useState<City[]>(cities);
+  const [ originalCities, setOriginalCities ] = useState<City[]>(cities);
 
   useEffect(() => {
     axios.get<IBGEUFResponse[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderby=nome').then(response => {
@@ -64,18 +64,18 @@ export default function App() {
             }));
 
             setCities(cities);
-            setOriginCities(cities);
+            setOriginalCities(cities);
         }
     });
   }, [selectedUF]);
 
-  const toggleModal = () => {
+  const handleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
   const handleFilterCity = (filter: string) => {
 
-    const filteredCities = originCities.filter(city => {
+    const filteredCities = originalCities.filter(city => {
       return city.name.includes(filter);
     });
 
@@ -89,9 +89,8 @@ export default function App() {
   );
 
   const onItemPress = (city: City) => {
-    setIdCity(city.id);
     setSelectedCity(city.name);
-    toggleModal();
+    handleModal();
   };
 
   return (
@@ -111,7 +110,7 @@ export default function App() {
       <Text style={styles.label}>Cidade</Text>
       <TextInput 
           value={selectedCity}
-          onTouchStart={toggleModal}
+          onTouchStart={handleModal}
           editable={false}
           style={styles.input} 
           placeholder="Qual a cidade?" 
@@ -132,7 +131,7 @@ export default function App() {
               keyExtractor={city => String(city.id)}
               renderItem={renderItem}
             />
-            <Button title="OK" onPress={toggleModal} />
+            <Button title="OK" onPress={handleModal} />
           </View>
         </View>
         
@@ -143,59 +142,59 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#f0f0f7",
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    containerModal: {
+  container: {
       flex: 1,
       backgroundColor: "#f0f0f7",
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: 10,
-      paddingTop: 20
   },
-    list: {
-      flex: 1,
-      backgroundColor: "#f0f0f7",
-      width: '90%'
-    },
-    label: {
-        color: 'purple',
-        width: '90%',
-        fontWeight: "bold"
-    },
-    input: {
-        height: 54,
-        backgroundColor: '#FFF',
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        marginTop: 4,
-        marginBottom: 16,
-        width: '90%',
-        fontWeight: "bold",
-    },
-    inputSelect: {
+  containerModal: {
+    flex: 1,
+    backgroundColor: "#f0f0f7",
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    paddingTop: 20
+  },
+  list: {
+    flex: 1,
+    backgroundColor: "#f0f0f7",
+    width: '90%'
+  },
+  label: {
+      color: 'purple',
+      width: '90%',
+      fontWeight: "bold"
+  },
+  input: {
       height: 54,
       backgroundColor: '#FFF',
       borderRadius: 8,
       paddingHorizontal: 16,
       marginTop: 4,
       marginBottom: 16,
-      marginLeft: 15,
-      width: '91%',
+      width: '90%',
       fontWeight: "bold",
-    },
-    item: {
-      padding: 10,
-      fontSize: 18,
-      height: 44,
-    },
-    listItem: {
-      backgroundColor: '#CDD4E4',
-      marginTop: 20,
-      padding: 30,
-    },
+  },
+  inputSelect: {
+    height: 54,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 16,
+    marginLeft: 15,
+    width: '91%',
+    fontWeight: "bold",
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+  listItem: {
+    backgroundColor: '#CDD4E4',
+    marginTop: 20,
+    padding: 30,
+  },
 });
